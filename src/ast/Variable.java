@@ -23,6 +23,15 @@ public class Variable extends Expression
     }
 
     /**
+     * Returns the name of the variable stored in the Variable node.
+     * @return type String, the name of the variable stored in the Variable node
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
      * A method inherited from the abstract Statement class to execute the variable which
      *      evaluates the variable node by looking up the identifier in the environment
      *      hash map and returning the returned value.

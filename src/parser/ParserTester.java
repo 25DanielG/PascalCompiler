@@ -28,10 +28,7 @@ public class ParserTester
             Scanner lex = new Scanner(inStream);
             Parser yacc = new Parser(lex);
             Environment env = new Environment();
-            while (lex.hasNext())
-            {
-                yacc.parseStatement(false).exec(env);
-            }
+            yacc.parseProgram().exec(env);
         }
         catch (FileNotFoundException e)
         {

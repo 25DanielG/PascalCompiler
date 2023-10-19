@@ -1,29 +1,30 @@
 package src.parser;
-
 import java.util.HashMap;
 import java.util.Map;
 import src.scanner.ScanErrorException;
 import src.scanner.Scanner;
 import src.scanner.Token;
-
 import java.util.ArrayList;
-
 import src.ast.*;
 import src.ast.Number;
 import src.environments.Environment;
-
 /**
  * The Parser class is responsible for parsing a given input stream and based on grammar rules,
  *      and returning larger statements.
  * @author Daniel Gergov
  * @version 10/02/2023
+ * program → PROCEDURE id (maybeparms) ; stmt program | stmt .
  * stmt → WRITELN ( expr ) ; | BEGIN stmts END ; | id := expr ; | IF cond THEN stmt
  *      | WHILE cond DO stmt | FOR id := expr TO expr DO stmt | CONTINUE ; | BREAK ;
  *      | IF cond THEN stmt ELSE stmt
+ * maybeparms → parms | ε
+ * parms → parms , id | id
  * stmts → stmts stmt | ε
  * expr → expr + term | expr - term | term
  * term → term * factor | term / factor | factor
- * factor → ( expr ) | - factor | num | id
+ * factor → ( expr ) | - factor | num | id | id(maybeargs)
+ * maybeargs → args | ε
+ * args → args , expr | expr
  * cond → expr relop expr
  * relop → = | <> | < | > | <= | >=
  */
@@ -32,7 +33,6 @@ public class Parser
     private Scanner scanner;
     private Token currentToken;
     private Map<String, Variable> symtab;
-
     /**
      * Constructor for the Parser class that takes in a Scanner object and initializes the
      *      currentToken instance variable to the next token in the input stream.
@@ -45,7 +45,6 @@ public class Parser
         currentToken = this.scanner.nextToken();
         symtab = new HashMap<String, Variable>();
     }
-
     /**
      * The eat method is responsible for eating the current token and checking if the current
      *      token is equal to the expected token. If the current token is equal to the expected
@@ -58,13 +57,13 @@ public class Parser
      */
     private void eat(Token expected)
     {
-        if (expected.equals(currentToken))
+        if(expected.equals(currentToken))
         {
             try
             {
                 currentToken = scanner.nextToken();
             }
-            catch (ScanErrorException e)
+            catch(ScanErrorException e)
             {
                 e.printStackTrace();
             }
@@ -74,7 +73,6 @@ public class Parser
             throw new IllegalArgumentException("Expected " + expected + " but found " + currentToken);
         }
     }
-
     /**
      * The parseNumber method is responsible for parsing the next token which is required
      *      to be a number token. The method returns the parsed number and eats the token
@@ -88,7 +86,41 @@ public class Parser
         eat(new Token(Scanner.TOKEN_TYPE.NUMBER, currentToken.getValue()));
         return new Number(number);
     }
-
+    /**
+     * 
+     * @return
+     */
+    public Program parseProgram()
+    {
+        ArrayList<ProcedureDeclaration> procedures = new ArrayList<ProcedureDeclaration>();
+        while(currentToken.getValue().equals("PROCEDURE"))
+        {
+            eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "PROCEDURE"));
+            String id = currentToken.getValue();
+            eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
+            eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "("));
+            ArrayList<src.ast.Variable> parameters = new ArrayList<src.ast.Variable>();
+            if(!currentToken.getValue().equals(")"))
+            {
+                String param = currentToken.getValue();
+                eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
+                parameters.add(new src.ast.Variable(param));
+                while(currentToken.getValue().equals(","))
+                {
+                    eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ","));
+                    param = currentToken.getValue();
+                    eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
+                    parameters.add(new src.ast.Variable(param));
+                }
+            }
+            eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ")"));
+            eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
+            Statement statement = parseStatement(false);
+            procedures.add(new ProcedureDeclaration(id, parameters.toArray(new src.ast.Variable[parameters.size()]), statement));
+        }
+        Statement statement = parseStatement(false);
+        return new Program(procedures.toArray(new ProcedureDeclaration[procedures.size()]), statement);
+    }
     /**
      * The parseStatement method is responsible for parsing a statement which is defined
      *      as WRITELN(NUMBER), an assignment, a loop, or if, or a block. The method eats
@@ -103,40 +135,40 @@ public class Parser
      */
     public Statement parseStatement(boolean ignoreSemi)
     {
-        if (currentToken.getValue().equals("WRITELN"))
+        if(currentToken.getValue().equals("WRITELN"))
         {
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "WRITELN"));
             eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "("));
             Expression exp = parseExpression();
             eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ")"));
-            if (!ignoreSemi)
+            if(!ignoreSemi)
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
             }
             return new Writeln(exp);
         }
-        else if (currentToken.getValue().equals("BEGIN"))
+        else if(currentToken.getValue().equals("BEGIN"))
         {
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "BEGIN"));
             ArrayList<Statement> list = new ArrayList<Statement>();
-            while (!currentToken.equals(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "END")))
+            while(!currentToken.equals(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "END")))
             {
                 list.add(parseStatement(false));
             }
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "END"));
-            if (!ignoreSemi)
+            if(!ignoreSemi)
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
             }
             return new Block(list.toArray(new Statement[list.size()]));
         }
-        else if (currentToken.getValue().equals("IF"))
+        else if(currentToken.getValue().equals("IF"))
         {
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "IF"));
             Condition cond = parseCondition();
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "THEN"));
             Statement statement = parseStatement(false);
-            if (currentToken.getValue().equals("ELSE"))
+            if(currentToken.getValue().equals("ELSE"))
             {
                 eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "ELSE"));
                 Statement elseStatement = parseStatement(false);
@@ -147,7 +179,7 @@ public class Parser
                 return new If(cond, statement);
             }
         }
-        else if (currentToken.getValue().equals("WHILE"))
+        else if(currentToken.getValue().equals("WHILE"))
         {
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "WHILE"));
             Condition cond = parseCondition();
@@ -155,11 +187,11 @@ public class Parser
             Statement statement = parseStatement(false);
             return new While(cond, statement);
         }
-        else if (currentToken.getValue().equals("FOR"))
+        else if(currentToken.getValue().equals("FOR"))
         {
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "FOR"));
             Statement begin = parseStatement(true);
-            if (!(begin instanceof Assignment))
+            if(!(begin instanceof Assignment))
             {
                 throw new IllegalArgumentException("Expected assignment in for loop heading.");
             }
@@ -169,32 +201,32 @@ public class Parser
             Statement statement = parseStatement(false);
             return new For(begin, end, statement);
         }
-        else if (currentToken.getValue().equals("CONTINUE"))
+        else if(currentToken.getValue().equals("CONTINUE"))
         {
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "CONTINUE"));
-            if (!ignoreSemi)
+            if(!ignoreSemi)
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
             }
             return new Continue();
         }
-        else if (currentToken.getValue().equals("BREAK"))
+        else if(currentToken.getValue().equals("BREAK"))
         {
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "BREAK"));
-            if (!ignoreSemi)
+            if(!ignoreSemi)
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
             }
             return new Break();
         }
-        else if (currentToken.getType() == Scanner.TOKEN_TYPE.IDENTIFIER)
+        else if(currentToken.getType() == Scanner.TOKEN_TYPE.IDENTIFIER)
         {
             String id = currentToken.getValue();
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
             eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ":="));
             Expression exp = parseExpression();
             Assignment assign = new Assignment(id, exp);
-            if (!ignoreSemi)
+            if(!ignoreSemi)
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
             }
@@ -202,7 +234,6 @@ public class Parser
         }
         throw new IllegalArgumentException("Unexpected Statement, got: " + currentToken.getValue());
     }
-
     /**
      * The parseCondition method is responsible for parsing a condition which is defined as
      *      condition -> expression operator expression. The method returns the parsed condition
@@ -215,7 +246,7 @@ public class Parser
     {
         Expression left = parseExpression();
         String op;
-        if (currentToken.getType() == Scanner.TOKEN_TYPE.OPERATOR)
+        if(currentToken.getType() == Scanner.TOKEN_TYPE.OPERATOR)
         {
             op = currentToken.getValue();
             eat(currentToken);
@@ -227,10 +258,9 @@ public class Parser
         Expression right = parseExpression();
         return new Condition(left, right, op);
     }
-
     /**
      * The parseFactor method is responsible for parsing a factor which is defined as
-     *      factor -> num | ( factor ) | - factor | id. The method returns the parsed factor
+     *      factor -> num | ( expr ) | - factor | id | id(). The method returns the parsed factor
      *     as an Expression AST node object.
      * @return an Expression AST ndoe representing the parsed factor
      * @precondition the current token is not null and of type NUMBER or OPERATOR
@@ -238,34 +268,49 @@ public class Parser
      */
     private Expression parseFactor()
     {
-        if (currentToken.getType() == Scanner.TOKEN_TYPE.OPERATOR)
+        if(currentToken.getType() == Scanner.TOKEN_TYPE.OPERATOR)
         {
-            if (currentToken.getValue().equals("("))
+            if(currentToken.getValue().equals("("))
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "("));
                 Expression factor = parseExpression();
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ")"));
                 return factor;
             }
-            else if (currentToken.getValue().equals("-"))
+            else if(currentToken.getValue().equals("-"))
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "-"));
                 return new BinOp(new Number(-1), parseFactor(), "*");
             }
         }
-        else if (currentToken.getType() == Scanner.TOKEN_TYPE.NUMBER)
+        else if(currentToken.getType() == Scanner.TOKEN_TYPE.NUMBER)
         {
             return parseNumber();
         }
-        else if (currentToken.getType() == Scanner.TOKEN_TYPE.IDENTIFIER)
+        else if(currentToken.getType() == Scanner.TOKEN_TYPE.IDENTIFIER)
         {
             String id = currentToken.getValue();
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, id));
+            if(currentToken.getValue().equals("("))
+            {
+                eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "("));
+                ArrayList<src.ast.Expression> arguments = new ArrayList<src.ast.Expression>();
+                if(!currentToken.getValue().equals(")"))
+                {
+                    arguments.add(parseExpression());
+                    while(currentToken.getValue().equals(","))
+                    {
+                        eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ","));
+                        arguments.add(parseExpression());
+                    }
+                }
+                eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ")"));
+                return new src.ast.ProcedureCall(id, arguments.toArray(new src.ast.Expression[arguments.size()]));
+            }
             return new src.ast.Variable(id);
         }
         throw new IllegalArgumentException("Expected factor but found " + currentToken);
     }
-
     /**
      * The parseTerm method parses terms that contain factors and operators. The method
      *      parses a factor and stores the value and then parses either a multiplication
@@ -279,24 +324,24 @@ public class Parser
     {
         Expression left = parseFactor();
         Expression exp = null;
-        while (currentToken.getType() == Scanner.TOKEN_TYPE.OPERATOR 
+        while(currentToken.getType() == Scanner.TOKEN_TYPE.OPERATOR 
             && (currentToken.getValue().equals("*") 
             || currentToken.getValue().equals("/") 
             || (currentToken.getValue().equals("mod"))))
         {
-            if (currentToken.getValue().equals("*"))
+            if(currentToken.getValue().equals("*"))
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "*"));
                 Expression right = parseFactor();
                 exp = new BinOp(left, right, "*");
             }
-            else if (currentToken.getValue().equals("/"))
+            else if(currentToken.getValue().equals("/"))
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "/"));
                 Expression right = parseFactor();
                 exp = new BinOp(left, right, "/");
             }
-            else if (currentToken.getValue().equals("mod"))
+            else if(currentToken.getValue().equals("mod"))
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "mod"));
                 Expression right = parseFactor();
@@ -305,7 +350,6 @@ public class Parser
         }
         return exp == null ? left : exp;
     }
-
     /**
      * The parseExpression method parses expressions that contain terms and operators. The method
      *      first parses a term and then constantly parses operator tokens that are either a +
@@ -319,16 +363,16 @@ public class Parser
     {
         Expression exp = null;
         Expression left = parseTerm();
-        while (currentToken.getType() == Scanner.TOKEN_TYPE.OPERATOR 
+        while(currentToken.getType() == Scanner.TOKEN_TYPE.OPERATOR 
             && (currentToken.getValue().equals("+") || currentToken.getValue().equals("-")))
         {
-            if (currentToken.getValue().equals("+"))
+            if(currentToken.getValue().equals("+"))
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "+"));
                 Expression right = parseTerm();
                 exp = new BinOp(left, right, "+");
             }
-            else if (currentToken.getValue().equals("-")) {
+            else if(currentToken.getValue().equals("-")) {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "-"));
                 Expression right = parseTerm();
                 exp = new BinOp(left, right, "-");
