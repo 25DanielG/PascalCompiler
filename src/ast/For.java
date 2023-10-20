@@ -1,5 +1,7 @@
 package src.ast;
 
+import java.util.HashMap;
+import java.util.Map;
 import src.environments.Environment;
 
 /**
@@ -39,13 +41,18 @@ public class For extends Statement
      * @param env type Environment the environment of where the exec method will run
      */
     @Override
-    public void exec(Environment env)
+    public void exec(Environment env) throws ParseErrorException
     {
         Assignment assign = (Assignment) begin;
         assign.exec(env);
         int count = env.getVariable(assign.getName());
         int bound = end.eval(env);
         env.modifyLoopDepth(true);
+        Map<Class<?>, Integer> map = new HashMap<Class<?>, Integer>();
+        map.put(ContinueException.class, 1);
+        map.put(BreakException.class, 2);
+        map.put(ExitException.class, 3);
+        whileLoop: // label the while loop
         while (count <= bound)
         {
             try
@@ -53,14 +60,18 @@ public class For extends Statement
                 statement.exec(env);
                 env.setVariable(assign.getName(), ++count);
             }
-            catch (BreakException e)
+            catch (ParseErrorException e)
             {
-                break;
-            }
-            catch (ContinueException e)
-            {
-                env.setVariable(assign.getName(), ++count);
-                continue;
+                switch(map.get(e.getClass()))
+                {
+                    case 1:
+                        env.setVariable(assign.getName(), ++count);
+                        continue;
+                    case 2:
+                        break whileLoop; // break out of the while loop not the switch case
+                    case 3:
+                        throw new ExitException();
+                }
             }
         }
         env.modifyLoopDepth(false);

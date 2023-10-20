@@ -16,7 +16,7 @@ import src.environments.Environment;
  * program → PROCEDURE id (maybeparms) ; stmt program | stmt .
  * stmt → WRITELN ( expr ) ; | BEGIN stmts END ; | id := expr ; | IF cond THEN stmt
  *      | WHILE cond DO stmt | FOR id := expr TO expr DO stmt | CONTINUE ; | BREAK ;
- *      | IF cond THEN stmt ELSE stmt
+ *      | IF cond THEN stmt ELSE stmt | EXIT ;
  * maybeparms → parms | ε
  * parms → parms , id | id
  * stmts → stmts stmt | ε
@@ -218,6 +218,15 @@ public class Parser
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
             }
             return new Break();
+        }
+        else if(currentToken.getValue().equals("EXIT"))
+        {
+            eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "EXIT"));
+            if(!ignoreSemi)
+            {
+                eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
+            }
+            return new Exit();
         }
         else if(currentToken.getType() == Scanner.TOKEN_TYPE.IDENTIFIER)
         {

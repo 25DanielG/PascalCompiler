@@ -28,11 +28,10 @@ public class Block extends Statement
      * @precondition env is not null
      * @postcondition the statement is executed
      * @param env type Environment the environment of where the exec method will run
-     * @throws ContinueException if a statement inside the block is a continue node
-     * @throws BreakException if a statement inside the block is a break node
+     * @throws ParseErrorException if a statement inside the block is a continue, break, exit node
      */
     @Override
-    public void exec(Environment env) throws ContinueException, BreakException
+    public void exec(Environment env) throws ParseErrorException
     {
         for (int i = 0; i < statements.length; ++i)
         {
@@ -40,13 +39,9 @@ public class Block extends Statement
             {
                 statements[i].exec(env);
             }
-            catch (ContinueException e)
+            catch (ParseErrorException e)
             {
-                throw new ContinueException("");
-            }
-            catch (BreakException e)
-            {
-                throw new BreakException("");
+                throw e;
             }
         }
     }

@@ -38,7 +38,7 @@ public class IfElse extends Statement
      * @param env type Environment the environment of where the exec method will run
      */
     @Override
-    public void exec(Environment env) throws ContinueException, BreakException
+    public void exec(Environment env) throws ParseErrorException
     {
         if (condition.eval(env) == 1)
         {
@@ -46,26 +46,18 @@ public class IfElse extends Statement
             {
                 statement.exec(env);
             }
-            catch (ContinueException e)
+            catch (ParseErrorException e)
             {
-                throw new ContinueException("");
-            }
-            catch (BreakException e)
-            {
-                throw new BreakException("");
+                throw e;
             }
         } else {
             try
             {
                 elseStatement.exec(env);
             }
-            catch (ContinueException e)
+            catch (ParseErrorException e)
             {
-                throw new ContinueException("");
-            }
-            catch (BreakException e)
-            {
-                throw new BreakException("");
+                throw e;
             }
         }
     }

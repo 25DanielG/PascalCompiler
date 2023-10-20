@@ -55,13 +55,12 @@ public class ProcedureCall extends Expression
             }
             procedure.getStatement().exec(newEnv);
         }
-        catch (BreakException e)
+        catch (ParseErrorException e)
         {
-            throw new RuntimeException("Break statement not inside loop");
-        }
-        catch (ContinueException e)
-        {
-            throw new RuntimeException("Continue statement not inside loop");
+            if (e instanceof ContinueException || e instanceof BreakException)
+            {
+                throw new RuntimeException("Break/Continue statement not inside loop");
+            }
         }
         return newEnv.getVariable(id);
     }

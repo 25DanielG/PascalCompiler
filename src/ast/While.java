@@ -1,5 +1,8 @@
 package src.ast;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 import src.environments.Environment;
 
 /**
@@ -35,22 +38,30 @@ public class While extends Statement
      * @param env type Environment the environment of where the exec method will run
      */
     @Override
-    public void exec(Environment env)
+    public void exec(Environment env) throws ParseErrorException
     {
         env.modifyLoopDepth(true);
+        Map<Class<?>, Integer> map = new HashMap<Class<?>, Integer>();
+        map.put(ContinueException.class, 1);
+        map.put(BreakException.class, 2);
+        map.put(ExitException.class, 3);
         while (condition.eval(env) == 1)
         {
             try
             {
                 statement.exec(env);
             }
-            catch (BreakException e)
+            catch (ParseErrorException e)
             {
-                break;
-            }
-            catch (ContinueException e)
-            {
-                continue;
+                switch(map.get(e.getClass()))
+                {
+                    case 1:
+                        continue;
+                    case 2:
+                        break;
+                    case 3:
+                        throw new ExitException();
+                }
             }
         }
         env.modifyLoopDepth(false);

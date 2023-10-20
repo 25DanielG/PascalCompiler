@@ -21,7 +21,7 @@ public class Break extends Statement
      * @throws IllegalArgumentException if the break statement is not used inside a loop
      */
     @Override
-    public void exec(Environment env) throws ContinueException, BreakException
+    public void exec(Environment env) throws BreakException
     {
         if (env.getLoopDepth() == 0) {
             throw new IllegalArgumentException("Break statement can only be used within a loop.");

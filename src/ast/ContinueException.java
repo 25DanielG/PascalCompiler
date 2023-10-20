@@ -7,7 +7,7 @@ package src.ast;
  * @author Daniel Gergov
  * @version 10/16/23
  */
-public class ContinueException extends Exception
+public class ContinueException extends ParseErrorException
 {
     /**
      * Default constructor for the ContinueException class with no parameters

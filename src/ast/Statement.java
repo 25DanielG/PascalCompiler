@@ -17,8 +17,7 @@ public abstract class Statement
      * @param env type Environment, the environment of where the exec method will run
      * @precondition the env parameter is not null
      * @postcondition the statement is executed
-     * @throws BreakException to handle the break statement
-     * @throws ContinueException to handle the continue statement
+     * @throws ParseErrorException to handle the break, continue, or exit statements
      */
-    public abstract void exec(Environment env) throws BreakException, ContinueException;
+    public abstract void exec(Environment env) throws ParseErrorException;
 }

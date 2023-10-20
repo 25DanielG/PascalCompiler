@@ -7,7 +7,7 @@ package src.ast;
  * @author Daniel Gergov
  * @version 10/16/23
  */
-public class BreakException extends Exception
+public class BreakException extends ParseErrorException
 {
     /**
      * Default constructor for the BreakException class with no parameters
