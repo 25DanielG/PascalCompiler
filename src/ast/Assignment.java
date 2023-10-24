@@ -36,7 +36,7 @@ public class Assignment implements Statement
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the assignment node of
+     * A method inherited from the Statement interface to execute the assignment node of
      *      the AST. The method assigns the variable to the evaluated expression and puts
      *      the variable inside the environment hash map.
      * @precondition env is not null and the variable is inside the environment

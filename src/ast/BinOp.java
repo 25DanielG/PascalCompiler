@@ -30,7 +30,7 @@ public class BinOp implements Expression
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the binary
+     * A method inherited from the Statement interface to execute the binary
      *      operator node of the AST. The method checks the type of the operator
      *      evalutaed the left and right side expressions and returns the resulting value.
      * @precondition env is not null

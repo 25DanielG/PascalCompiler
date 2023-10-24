@@ -32,7 +32,7 @@ public class Variable implements Expression
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the variable which
+     * A method inherited from the Statement interface to execute the variable which
      *      evaluates the variable node by looking up the identifier in the environment
      *      hash map and returning the returned value.
      * @parameter type Environment the env for which the expression evaluates in

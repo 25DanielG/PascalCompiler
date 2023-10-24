@@ -11,7 +11,7 @@ import src.environments.Environment;
 public class Break implements Statement
 {
     /**
-     * A method inherited from the abstract Statement class to execute the break node of
+     * A method inherited from the Statement interface to execute the break node of
      *      the AST. The method breaks from the loop that the node is currently inside of
      *      by throwing a BreakException.
      * @precondition env is not null

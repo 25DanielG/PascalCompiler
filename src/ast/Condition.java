@@ -30,7 +30,7 @@ public class Condition implements Expression
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the condition
+     * A method inherited from the Statement interface to execute the condition
      *      node of the AST. The method checks the type of the operator with every relative
      *      opeerator and evaluates the left and right side expressions and returns 0 or 1
      *      representing a boolean value.

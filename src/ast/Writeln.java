@@ -5,7 +5,7 @@ import src.environments.Environment;
 /**
  * The Writeln class represents a Writeln node in the AST for which the writeln
  *      statement prints a certain expression to console. The class inherits the
- *      Statement class and provides an exec method to execute the writeln statement
+ *      Statement interface and provides an exec method to execute the writeln statement
  *      which uses Java's System.out.println() method to print the write to console.
  * @author Daniel Gergov
  * @version 10/16/23
@@ -24,7 +24,7 @@ public class Writeln implements Statement
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the writeln by
+     * A method inherited from the Statement interface to execute the writeln by
      *      calling Java's System.out.println() method to write the expression to console.
      *      The method evaluates the expression and prints the returned value to console.
      * @param env the environment of where the exec method will run

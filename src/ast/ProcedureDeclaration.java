@@ -31,7 +31,7 @@ public class ProcedureDeclaration implements Statement
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the ProcedureDeclaration
+     * A method inherited from the Statement interface to execute the ProcedureDeclaration
      *      node of the AST. The method associates the procedure identifier and the statement
      *      inside the procedure together in the environment.
      * @precondition env is not null

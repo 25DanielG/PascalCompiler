@@ -23,7 +23,7 @@ public class Number implements Expression
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the number
+     * A method inherited from the Statement interface to execute the number
      *      node of the AST. The method returns the value of the number node in
      *      evaluation.
      * @precondition env is not null

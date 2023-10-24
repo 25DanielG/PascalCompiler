@@ -11,7 +11,7 @@ import src.environments.Environment;
 public class Continue implements Statement
 {
     /**
-     * A method inherited from the abstract Statement class to execute the continue node of
+     * A method inherited from the Statement interface to execute the continue node of
      *      the AST. The method continues in the loop that the node is currently inside of
      *      by throwing a ContinueException.
      * @precondition env is not null

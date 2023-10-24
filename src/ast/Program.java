@@ -27,7 +27,7 @@ public class Program implements Statement
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the Program node
+     * A method inherited from the Statement interface to execute the Program node
      *      of the AST. The method executes the procedure declarations and the statement
      *      inside the program node of the AST.
      * @precondition env is not null

@@ -29,7 +29,7 @@ public class IfElse implements Statement
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the if else node of
+     * A method inherited from the Statement interface to execute the if else node of
      *      the AST. The method evaluates the condition expression, and if it is true, the node
      *      executes the statement inside the if node. If the condition is false, the node
      *      executes the statement inside the else.

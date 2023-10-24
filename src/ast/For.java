@@ -32,7 +32,7 @@ public class For implements Statement
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the for node of
+     * A method inherited from the Statement interface to execute the for node of
      *      the AST. The method assigns the start variable to the evaluated expression and puts
      *      loops from the start variable to the end expression and executes the statement while
      *      the start variable is less than the end expression

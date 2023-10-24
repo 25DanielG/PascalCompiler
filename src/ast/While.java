@@ -29,7 +29,7 @@ public class While implements Statement
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the while node of
+     * A method inherited from the Statement interface to execute the while node of
      *      the AST. The method evaluates the initial condition and executes the statement
      *      as long as the condition stays true after each iteration of the while loop.
      * @precondition env is not null

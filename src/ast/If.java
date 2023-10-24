@@ -25,7 +25,7 @@ public class If implements Statement
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the if node of
+     * A method inherited from the Statement interface to execute the if node of
      *      the AST. The method evaluates the condition expression, and if it is true, the node
      *      executes the statement inside the if node.
      * @precondition env is not null

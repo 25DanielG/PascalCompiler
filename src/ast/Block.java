@@ -22,7 +22,7 @@ public class Block implements Statement
     }
 
     /**
-     * A method inherited from the abstract Statement class to execute the block
+     * A method inherited from the Statement interface to execute the block
      *      node of the AST. The method checks loops over every statement contained in
      *      the block and executes each statement.
      * @precondition env is not null
