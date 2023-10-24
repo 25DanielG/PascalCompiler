@@ -15,7 +15,8 @@ public class Scanner
     private BufferedReader in;
     private char currentChar;
     private boolean eof;
-    public int lineno, colno;
+    private int lineno;
+    private int colno;
 
     public static enum TOKEN_TYPE { OPERATOR, IDENTIFIER, NUMBER, EOF, UMKNOWN };
 
@@ -390,5 +391,27 @@ public class Scanner
         else {
             throw new ScanErrorException("Unexpected character: " + currentChar);
         }
+    }
+
+    /**
+     * Returns the line number associated with the line the Scanner is on while parsing the input.
+     *      The line number in incremeneted elsewhere everytime the Scanner sees a "/n", and the
+     *      instance variable aids in error handling.
+     * @return type int, the line number associated with the Scanner object
+     */
+    public int getLineno()
+    {
+        return this.lineno;
+    }
+
+    /**
+     * Returns the column number associated with the column the Scanner is on while parsing the
+     *      input. The column number in incremeneted elsewhere everytime the Scanner sees
+     *      consumes a character, and the instance variable aids in error handling.
+     * @return type int, the column number associated with the Scanner object
+     */
+    public int getColno()
+    {
+        return this.colno;
     }
 }

@@ -10,7 +10,8 @@ import src.ast.Number;
 
 /**
  * The Parser class is responsible for parsing a given input stream and based on grammar rules,
- *      and returning larger statements.
+ *      and returning an AST consisting of types of nodes found in the ast package. Each node
+ *      is executable or evaluatable with their corresponding exec or eval methods.
  * @author Daniel Gergov
  * @version 10/02/2023
  * program → PROCEDURE id (maybeparms) ; stmt program | stmt .
@@ -71,7 +72,7 @@ public class Parser
         }
         else
         {
-            System.out.println("Error found on line " + scanner.lineno + " and column " + scanner.colno);
+            System.out.println("Error found on line " + scanner.getLineno() + " and column " + scanner.getColno());
             throw new IllegalArgumentException("Expected " + expected + " but found " + currentToken);
         }
     }
