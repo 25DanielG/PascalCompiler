@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -44,5 +45,13 @@ public class Variable implements Expression
     public int eval(Environment env)
     {
         return env.getVariable(this.name);
+    }
+
+    @Override
+    public void compile(Emitter e, Object... args)
+    {
+        e.addVariable(this.name);
+        e.emit("la $t0, var" + this.name);
+        e.emit("lw $v0, ($t0)");
     }
 }

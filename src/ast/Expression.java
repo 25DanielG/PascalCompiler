@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -12,11 +13,13 @@ import src.environments.Environment;
 public interface Expression
 {
     /**
-     * An asbract method that represents the evalution of any expression AST node.
+     * A method that represents the evalution of any expression AST node.
      * @param env the environment for which the expression will evaluate in.
      * @precondition env of type Environment is not null
      * @postcondition the current expression is evaluated and its valud is returned
      * @return type int, the integer for which the expression evaluates to
      */
-    public abstract int eval(Environment env);
+    public int eval(Environment env);
+
+    public void compile(Emitter e, Object... args);
 }

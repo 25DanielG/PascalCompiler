@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -60,5 +61,10 @@ public class IfElse implements Statement
                 throw e;
             }
         }
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        throw new RuntimeException("IfElse not implemented");
     }
 }

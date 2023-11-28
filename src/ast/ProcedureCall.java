@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -104,5 +105,10 @@ public class ProcedureCall implements Expression, Statement
                 throw new RuntimeException("Break/Continue statement not inside loop");
             }
         }
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        throw new RuntimeException("ProcedureCall not implemented");
     }
 }

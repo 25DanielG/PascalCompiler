@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -46,5 +47,13 @@ public class If implements Statement
                 throw e;
             }
         }
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        String label = "endif" + e.nextIfID();
+        condition.compile(e, label);
+        statement.compile(e);
+        e.emit(label + ":");
     }
 }

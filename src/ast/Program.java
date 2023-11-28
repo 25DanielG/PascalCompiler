@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -12,6 +13,7 @@ import src.environments.Environment;
  */
 public class Program implements Statement
 {
+    private VariableDeclaration[] variableDeclarations;
     private ProcedureDeclaration[] procedureDeclarations;
     private Statement statement;
 
@@ -20,8 +22,9 @@ public class Program implements Statement
      * @param procedureDeclarations type ProcedureDeclaration[] the procedure declarations
      * @param statement type Statement the statement inside the program
      */
-    public Program(ProcedureDeclaration[] procedureDeclarations, Statement statement)
+    public Program(VariableDeclaration[] variableDeclarations, ProcedureDeclaration[] procedureDeclarations, Statement statement)
     {
+        this.variableDeclarations = variableDeclarations;
         this.procedureDeclarations = procedureDeclarations;
         this.statement = statement;
     }
@@ -54,5 +57,31 @@ public class Program implements Statement
                 throw new RuntimeException("Break/Continue statement not inside loop");
             }
         }
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        if (args.length != 1 || !(args[0] instanceof String))
+        {
+            throw new IllegalArgumentException("Expected 1 argument of type String");
+        }
+        String outputFile = (String) args[0];
+        e = new Emitter(outputFile);
+        e.emit(".text");
+        e.emit(".globl main");
+        e.emit("main:");
+        statement.compile(e);
+        e.emit("li $v0 10");
+        e.emit("syscall");
+
+        for (String var : e.getVariables())
+        {
+            e.prepend("var" + var + ": .word 0");
+        }
+        e.prepend("new_line: .asciiz \"\\n\"");
+        e.prepend(".data");
+
+        e.push();
+        e.close();
     }
 }

@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -10,6 +11,19 @@ import src.environments.Environment;
  */
 public class Break implements Statement
 {
+    private Statement statement;
+    private int id;
+
+    public Break(Statement statement, int id)
+    {
+        if (!(statement instanceof While) && !(statement instanceof For))
+        {
+            throw new IllegalArgumentException("Break statement requires a While or For statement.");
+        }
+        this.statement = statement;
+        this.id = id;
+    }
+
     /**
      * A method inherited from the Statement interface to execute the break node of
      *      the AST. The method breaks from the loop that the node is currently inside of
@@ -27,5 +41,19 @@ public class Break implements Statement
             throw new IllegalArgumentException("Break statement can only be used within a loop.");
         }
         throw new BreakException();
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        String loop;
+        if (this.statement instanceof While)
+        {
+            loop = "while";
+        }
+        else
+        {
+            loop = "for";
+        }
+        e.emit("j term_" + loop + this.id);
     }
 }

@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -34,5 +35,16 @@ public class Writeln implements Statement
     public void exec(Environment env)
     {
         System.out.println(exp.eval(env));
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        exp.compile(e);
+        e.emit("move $a0, $v0");
+        e.emit("li $v0, 1");
+        e.emit("syscall");
+        e.emit("la $a0, new_line");
+        e.emit("li $v0, 4");
+        e.emit("syscall");
     }
 }

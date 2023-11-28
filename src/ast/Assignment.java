@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -35,17 +36,37 @@ public class Assignment implements Statement
         return this.name;
     }
 
+    public void decrementExp()
+    {
+        Expression e = this.exp;
+        BinOp b = new BinOp(e, new Number(1), "-");
+        this.exp = b;
+    }
+
     /**
      * A method inherited from the Statement interface to execute the assignment node of
      *      the AST. The method assigns the variable to the evaluated expression and puts
-     *      the variable inside the environment hash map.
+     *      the variable inside the environment hash map. If the variable is not defined
+     *      in the environment, an exception is thrown.
      * @precondition env is not null and the variable is inside the environment
      * @postcondition the statement is executed
      * @param env type Environment the environment of where the exec method will run
+     * @throws IllegalArgumentException if the variable is not defined in the environment
      */
     @Override
     public void exec(Environment env)
     {
+        if (env.getVariable(name) == null)
+        {
+            throw new IllegalArgumentException("Variable " + name + " is not defined");
+        }
         env.setVariable(name, exp.eval(env));
+    }
+
+    @Override
+    public void compile(Emitter e, Object... args)
+    {
+        exp.compile(e);
+        e.emit("sw $v0, var" + name);
     }
 }

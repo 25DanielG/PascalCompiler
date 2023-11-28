@@ -12,8 +12,10 @@ PROCEDURE addThree(z);
     END;
 
 BEGIN
-    WRITELN(max(3, 5));
+    WRITELN(max(3, 5)); // SHOULD OUTPUT 3
 
+    EXIT;
+    
     addThree(0);
 
     FOR i := 1 TO 10 DO

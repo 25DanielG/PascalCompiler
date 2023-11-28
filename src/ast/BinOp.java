@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -53,6 +54,38 @@ public class BinOp implements Expression
                 return left.eval(env) / right.eval(env);
             case "mod":
                 return left.eval(env) % right.eval(env);
+            default:
+                throw new IllegalArgumentException("Unexpected operator in expression evaluation");
+        }
+    }
+
+    @Override
+    public void compile(Emitter e, Object... args)
+    {
+        left.compile(e);
+        e.emitPush("$v0");
+        right.compile(e);
+        e.emitPop("$t0");
+        switch(this.op)
+        {
+            case "+":
+                e.emit("add $v0, $t0, $v0");
+                break;
+            case "-":
+                e.emit("sub $v0, $t0, $v0");
+                break;
+            case "*":
+                e.emit("mult $t0, $v0");
+                e.emit("mflo $v0");
+                break;
+            case "/":
+                e.emit("div $t0, $v0");
+                e.emit("mflo $v0");
+                break;
+            case "mod":
+                e.emit("div $t0, $v0");
+                e.emit("mfhi $v0");
+                break;
             default:
                 throw new IllegalArgumentException("Unexpected operator in expression evaluation");
         }

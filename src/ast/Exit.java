@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -31,5 +32,10 @@ public class Exit implements Statement
             throw new RuntimeException("Environment is null, cannot exit.");
         }
         throw new ExitException();
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        throw new RuntimeException("Exit compile not yet implemented");
     }
 }

@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -70,5 +71,10 @@ public class ProcedureDeclaration implements Statement
     public Variable[] getParameters()
     {
         return parameters;
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        throw new RuntimeException("ProcedureDeclaration not implemented");
     }
 }

@@ -2,6 +2,7 @@ package src.ast;
 
 import java.util.HashMap;
 import java.util.Map;
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -75,5 +76,31 @@ public class For implements Statement
             }
         }
         env.modifyLoopDepth(false);
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        int id = e.nextLoopID();
+        String label = "for" + id;
+        String term = "term_for" + id;
+        Assignment assign = (Assignment) begin;
+        assign.decrementExp();
+        assign.compile(e);
+        String variable = "var" + ((Assignment) begin).getName();
+        e.emit("lw $t1, " + variable);
+        e.emitPush("$t1");
+        e.emit("li $t2, " + this.end.eval(null));
+        e.emitPush("$t2");
+        e.emit(label + ":");
+        e.emitPop("$t2");
+        e.emitPop("$t1");
+        e.emit("addiu $t1, $t1, 1");
+        e.emit("sw $t1, " + variable);
+        e.emit("bgt $t1, $t2, " + term);
+        e.emitPush("$t1");
+        e.emitPush("$t2");
+        statement.compile(e);
+        e.emit("j " + label);
+        e.emit(term + ":");
     }
 }

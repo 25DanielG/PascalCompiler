@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -56,6 +57,42 @@ public class Condition implements Expression
                 return left.eval(env) > right.eval(env) ? 1 : 0;
             case "<":
                 return left.eval(env) < right.eval(env) ? 1 : 0;
+            default:
+                throw new IllegalArgumentException("Unexpected operator in expression evaluation");
+        }
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        if (args.length != 1 || !(args[0] instanceof String))
+        {
+            throw new IllegalArgumentException("Expected 1 argument for condition compilation");
+        }
+        left.compile(e);
+        e.emitPush("$v0");
+        right.compile(e);
+        e.emitPop("$t0");
+        String targetLabel = (String) args[0];
+        switch (op)
+        {
+            case "=":
+                e.emit("bne $t0, $v0, " + targetLabel);
+                break;
+            case "<>":
+                e.emit("beq $t0, $v0, " + targetLabel);
+                break;
+            case "<=":
+                e.emit("bgt $t0, $v0, " + targetLabel);
+                break;
+            case ">=":
+                e.emit("blt $t0, $v0, " + targetLabel);
+                break;
+            case ">":
+                e.emit("ble $t0, $v0, " + targetLabel);
+                break;
+            case "<":
+                e.emit("bge $t0, $v0, " + targetLabel);
+                break;
             default:
                 throw new IllegalArgumentException("Unexpected operator in expression evaluation");
         }

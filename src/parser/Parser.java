@@ -1,6 +1,7 @@
 package src.parser;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import src.scanner.ScanErrorException;
 import src.scanner.Scanner;
 import src.scanner.Token;
@@ -35,6 +36,8 @@ public class Parser
     private Scanner scanner;
     private Token currentToken;
     private Map<String, Variable> symtab;
+    private Object[] currentLoop;
+
     /**
      * Constructor for the Parser class that takes in a Scanner object and initializes the
      *      currentToken instance variable to the next token in the input stream.
@@ -46,6 +49,7 @@ public class Parser
         this.scanner = scanner;
         currentToken = this.scanner.nextToken();
         symtab = new HashMap<String, Variable>();
+        currentLoop = new Object[]{ new Stack<Statement>(), 0 };
     }
     /**
      * The eat method is responsible for eating the current token and checking if the current
@@ -95,6 +99,24 @@ public class Parser
      */
     public Program parseProgram()
     {
+        ArrayList<VariableDeclaration> variables = new ArrayList<VariableDeclaration>();
+        while(currentToken.getValue().equals("VAR"))
+        {
+            ArrayList<String> ids = new ArrayList<String>();
+            eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "VAR"));
+            String id = currentToken.getValue();
+            ids.add(id);
+            eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
+            while(!currentToken.getValue().equals(";"))
+            {
+                eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ","));
+                id = currentToken.getValue();
+                ids.add(id);
+                eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
+            }
+            eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
+            variables.add(new VariableDeclaration(ids.toArray(new String[ids.size()])));
+        }
         ArrayList<ProcedureDeclaration> procedures = new ArrayList<ProcedureDeclaration>();
         while(currentToken.getValue().equals("PROCEDURE"))
         {
@@ -122,7 +144,7 @@ public class Parser
             procedures.add(new ProcedureDeclaration(id, parameters.toArray(new src.ast.Variable[parameters.size()]), statement));
         }
         Statement statement = parseStatement(false);
-        return new Program(procedures.toArray(new ProcedureDeclaration[procedures.size()]), statement);
+        return new Program(variables.toArray(new VariableDeclaration[variables.size()]), procedures.toArray(new ProcedureDeclaration[procedures.size()]), statement);
     }
     /**
      * The parseStatement method is responsible for parsing a statement which is defined
@@ -184,14 +206,25 @@ public class Parser
         }
         else if(currentToken.getValue().equals("WHILE"))
         {
+            Stack<Statement> st = (Stack<Statement>) currentLoop[0];
+            st.push(new While(null, null));
+            currentLoop[1] = (int) currentLoop[1] + 1;
+
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "WHILE"));
             Condition cond = parseCondition();
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "DO"));
             Statement statement = parseStatement(false);
+
+            st.pop();
+            
             return new While(cond, statement);
         }
         else if(currentToken.getValue().equals("FOR"))
         {
+            Stack<Statement> st = (Stack<Statement>) currentLoop[0];
+            st.push(new For(null, null, null));
+            currentLoop[1] = (int) currentLoop[1] + 1;
+
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "FOR"));
             Statement begin = parseStatement(true);
             if(!(begin instanceof Assignment))
@@ -202,25 +235,32 @@ public class Parser
             Expression end = parseExpression();
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "DO"));
             Statement statement = parseStatement(false);
+
+            st.pop();
+
             return new For(begin, end, statement);
         }
         else if(currentToken.getValue().equals("CONTINUE"))
         {
+            Stack<Statement> st = (Stack<Statement>) currentLoop[0];
+
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "CONTINUE"));
             if(!ignoreSemi)
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
             }
-            return new Continue();
+            return new Continue(st.peek(), (int) currentLoop[1]);
         }
         else if(currentToken.getValue().equals("BREAK"))
         {
+            Stack<Statement> st = (Stack<Statement>) currentLoop[0];
+
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "BREAK"));
             if(!ignoreSemi)
             {
                 eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
             }
-            return new Break();
+            return new Break(st.peek(), (int) currentLoop[1]);
         }
         else if(currentToken.getValue().equals("EXIT"))
         {

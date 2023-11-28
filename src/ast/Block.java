@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -43,6 +44,14 @@ public class Block implements Statement
             {
                 throw e;
             }
+        }
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        for (Statement statement : statements)
+        {
+            statement.compile(e);
         }
     }
 }

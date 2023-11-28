@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -34,5 +35,10 @@ public class Number implements Expression
     public int eval(Environment env)
     {
         return value;
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        e.emit("li $v0, " + value);
     }
 }

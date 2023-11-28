@@ -1,5 +1,6 @@
 package src.ast;
 
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -20,4 +21,6 @@ public interface Statement
      * @throws ParseErrorException to handle the break, continue, or exit statements
      */
     public void exec(Environment env) throws ParseErrorException;
+
+    public void compile(Emitter e, Object... args);
 }

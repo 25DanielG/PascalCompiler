@@ -20,7 +20,7 @@ public class ParserTester
      *      Scanner class has no more tokens.
      * @param args command-line arguments parameter that Java requires to be specified here
      */
-    public static void main(String[] args) 
+    public static void main(String[] args)
     {
         try
         {
@@ -28,7 +28,7 @@ public class ParserTester
             Scanner lex = new Scanner(inStream);
             Parser yacc = new Parser(lex);
             Environment env = new Environment();
-            yacc.parseProgram().exec(env);
+            yacc.parseProgram().compile(null, "out.asm");
         }
         catch (FileNotFoundException e)
         {

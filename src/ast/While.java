@@ -2,6 +2,7 @@ package src.ast;
 
 import java.util.HashMap;
 import java.util.Map;
+import src.emitter.Emitter;
 import src.environments.Environment;
 
 /**
@@ -64,5 +65,17 @@ public class While implements Statement
             }
         }
         env.modifyLoopDepth(false);
+    }
+
+    public void compile(Emitter e, Object... args)
+    {
+        int id = e.nextLoopID();
+        String label = "while" + id;
+        e.emit(label + ":");
+        String end = "term_while" + id;
+        condition.compile(e, end);
+        statement.compile(e);
+        e.emit("j " + label);
+        e.emit(end + ":");
     }
 }
