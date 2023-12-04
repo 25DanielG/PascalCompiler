@@ -15,10 +15,12 @@ import src.ast.Number;
  *      is executable or evaluatable with their corresponding exec or eval methods.
  * @author Daniel Gergov
  * @version 10/02/2023
- * program → PROCEDURE id (maybeparms) ; stmt program | stmt .
+ * program → VAR ids ; program | VAR ids ; PROCEDURE id (maybeparms) ; stmt program | 
+ *      PROCEDURE id (maybeparms) ; stmt program | stmt .
  * stmt → WRITELN ( expr ) ; | BEGIN stmts END ; | id := expr ; | IF cond THEN stmt
  *      | WHILE cond DO stmt | FOR id := expr TO expr DO stmt | CONTINUE ; | BREAK ;
  *      | IF cond THEN stmt ELSE stmt | EXIT ;
+ * ids → ids , id | id
  * maybeparms → parms | ε
  * parms → parms , id | id
  * stmts → stmts stmt | ε
