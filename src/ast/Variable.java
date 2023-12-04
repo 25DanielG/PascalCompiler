@@ -47,11 +47,22 @@ public class Variable implements Expression
         return env.getVariable(this.name);
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the variable. The method
+     *      loads the variable value into the $v0 register by loading its address to the $t0
+     *      register. The method also tells the emitter by calling .addVariable() to store
+     *      the variable name in order to allocate space for the variable in the .data section.
+     *      This call adds support for using variables without declaring them.
+     * @param e the emitter for which the expression will emit assembly code to
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
     @Override
     public void compile(Emitter e, Object... args)
     {
         e.addVariable(this.name);
         e.emit("la $t0, var" + this.name);
-        e.emit("lw $v0, ($t0)");
+        e.emit("lw $v0, ($t0)" + "\t# load the variable into $v0");
     }
 }

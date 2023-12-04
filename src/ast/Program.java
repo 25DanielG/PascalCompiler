@@ -59,6 +59,19 @@ public class Program implements Statement
         }
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the Program node.
+     *      The method compiles the program node by appending the start of a MIPS
+     *      program to the emitter. The method adds the compiled main program statement
+     *      to the emitter. After compiling the main code, the method prepends the
+     *      variable section of an assembly program to the emitter. The emitter's .getVariables()
+     *      method gives this method all the variables seen in the program.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the args parameter contains the output file and is of length 1
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
         if (args.length != 1 || !(args[0] instanceof String))
@@ -71,14 +84,15 @@ public class Program implements Statement
         e.emit(".globl main");
         e.emit("main:");
         statement.compile(e);
-        e.emit("li $v0 10");
+        e.emit("program_exit:");
+        e.emit("li $v0 10" + "\t# exit the program");
         e.emit("syscall");
 
         for (String var : e.getVariables())
         {
             e.prepend("var" + var + ": .word 0");
         }
-        e.prepend("new_line: .asciiz \"\\n\"");
+        e.prepend("new_line: .asciiz \"\\n\"" + "\t# new line variable");
         e.prepend(".data");
 
         e.push();

@@ -107,6 +107,7 @@ public class ProcedureCall implements Expression, Statement
         }
     }
 
+    @Override
     public void compile(Emitter e, Object... args)
     {
         throw new RuntimeException("ProcedureCall not implemented");

@@ -78,6 +78,20 @@ public class For implements Statement
         env.modifyLoopDepth(false);
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the for node of the AST.
+     *      The method compiles the for node by assigning the start variable to the evaluated
+     *      expression assigned to the for loop variable. The method then subtracts 1 from the
+     *      start variable in order to allow the incrementing step to be at the beginning of the
+     *      for loop. The method then compiles the end expression and compares the start variable
+     *      to the end variable. If the start variable is greater than the end variable, the for
+     *      loop jumps to the term loop label.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
         int id = e.nextLoopID();
@@ -87,20 +101,20 @@ public class For implements Statement
         assign.decrementExp();
         assign.compile(e);
         String variable = "var" + ((Assignment) begin).getName();
-        e.emit("lw $t1, " + variable);
+        e.emit("lw $t1, " + variable + "\t# load the start variable into $t1");
         e.emitPush("$t1");
-        e.emit("li $t2, " + this.end.eval(null));
+        e.emit("li $t2, " + this.end.eval(null) + "\t# load the end number into $t2");
         e.emitPush("$t2");
         e.emit(label + ":");
         e.emitPop("$t2");
         e.emitPop("$t1");
-        e.emit("addiu $t1, $t1, 1");
+        e.emit("addiu $t1, $t1, 1" + "\t# increment the for loop counter");
         e.emit("sw $t1, " + variable);
-        e.emit("bgt $t1, $t2, " + term);
+        e.emit("bgt $t1, $t2, " + term + "\t# check if the for loop is done");
         e.emitPush("$t1");
         e.emitPush("$t2");
         statement.compile(e);
-        e.emit("j " + label);
+        e.emit("j " + label + "\t# repeat the for loop");
         e.emit(term + ":");
     }
 }

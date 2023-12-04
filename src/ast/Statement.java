@@ -22,5 +22,12 @@ public interface Statement
      */
     public void exec(Environment env) throws ParseErrorException;
 
+    /**
+     * A method inherited from the abstract Statement class to compile the statement.
+     * @param e type Emitter, the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
     public void compile(Emitter e, Object... args);
 }

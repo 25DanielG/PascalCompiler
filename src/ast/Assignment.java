@@ -36,6 +36,10 @@ public class Assignment implements Statement
         return this.name;
     }
 
+    /**
+     * A method that decrements the expression of the assignment node by 1. The method
+     *      is used by the for AST node compile method to allow continue to work.
+     */
     public void decrementExp()
     {
         Expression e = this.exp;
@@ -63,10 +67,20 @@ public class Assignment implements Statement
         env.setVariable(name, exp.eval(env));
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the assignment node of
+     *      the AST. The method emits MIPS assembly code using an Emitter class which emits
+     *      the code to an output file. The method compiles the assignment expression
+     *      and sets the assignment variable equal to the expression.
+     * @param e type Emitter the emitter that emits the MIPS assembly code to an output file
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
     @Override
     public void compile(Emitter e, Object... args)
     {
         exp.compile(e);
-        e.emit("sw $v0, var" + name);
+        e.emit("sw $v0, var" + name + "\t# assign the variable");
     }
 }

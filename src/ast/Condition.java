@@ -62,6 +62,20 @@ public class Condition implements Expression
         }
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the condition node of the AST.
+     *      The condition node consists of two expressions and an operator. The method compiles
+     *      the left side of the condition expression and pushes the value of the expression 
+     *      onto the stack, then compiles the right side of the expression and pops the value
+     *      of the left side. The method then compares the two values and jumps to the target
+     *      tabel which represents false.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is length 1 and
+     *      stores the target label
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
         if (args.length != 1 || !(args[0] instanceof String))
@@ -76,25 +90,25 @@ public class Condition implements Expression
         switch (op)
         {
             case "=":
-                e.emit("bne $t0, $v0, " + targetLabel);
+                e.emit("bne $t0, $v0, " + targetLabel + "\t# if $t0 and $v0 are not equal");
                 break;
             case "<>":
-                e.emit("beq $t0, $v0, " + targetLabel);
+                e.emit("beq $t0, $v0, " + targetLabel + "\t# if $t0 and $v0 are equal");
                 break;
             case "<=":
-                e.emit("bgt $t0, $v0, " + targetLabel);
+                e.emit("bgt $t0, $v0, " + targetLabel + "\t# if $t0 is greater than $v0");
                 break;
             case ">=":
-                e.emit("blt $t0, $v0, " + targetLabel);
+                e.emit("blt $t0, $v0, " + targetLabel + "\t# if $t0 is less than $v0");
                 break;
             case ">":
-                e.emit("ble $t0, $v0, " + targetLabel);
+                e.emit("ble $t0, $v0, " + targetLabel + "\t# if $t0 is less than or equal to $v0");
                 break;
             case "<":
-                e.emit("bge $t0, $v0, " + targetLabel);
+                e.emit("bge $t0, $v0, " + targetLabel + "\t# if $t0 is greater than or equal to $v0");
                 break;
             default:
-                throw new IllegalArgumentException("Unexpected operator in expression evaluation");
+                throw new IllegalArgumentException("Unexpected operator in expression evaluationp");
         }
     }
 }

@@ -34,8 +34,18 @@ public class Exit implements Statement
         throw new ExitException();
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the exit node of the AST.
+     *      The method emits the MIPS assembly code to exit the program by jumping to the 
+     *      exit program label.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
-        throw new RuntimeException("Exit compile not yet implemented");
+        e.emit("j program_exit" + "\t# exit from the current routine");
     }
 }

@@ -37,13 +37,23 @@ public class Writeln implements Statement
         System.out.println(exp.eval(env));
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the writeln. The method
+     *      compiles the expression and prints the returned value to console. The method
+     *      then loads the new line variable into the $a0 register and prints a new line.
+     * @param e the emitter for which the expression will emit assembly code to
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
         exp.compile(e);
         e.emit("move $a0, $v0");
-        e.emit("li $v0, 1");
+        e.emit("li $v0, 1" + "\t# print the expression");
         e.emit("syscall");
-        e.emit("la $a0, new_line");
+        e.emit("la $a0, new_line" + "\t# print a new line");
         e.emit("li $v0, 4");
         e.emit("syscall");
     }

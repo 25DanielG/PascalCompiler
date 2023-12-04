@@ -47,6 +47,16 @@ public class Block implements Statement
         }
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the block node of the AST.
+     *      The block node which consists of multiple statements is compiled by compiling each
+     *      of the statements within the node.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
         for (Statement statement : statements)

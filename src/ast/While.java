@@ -67,6 +67,18 @@ public class While implements Statement
         env.modifyLoopDepth(false);
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the while node of the AST.
+     *      The method starts the compilation by adding the start label to the while loop, then
+     *      compiling the condition expression, and if the condition is false, the assembly jumps
+     *      to the term loop label. The method then compiles the main statement inside the while
+     *      loop.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
         int id = e.nextLoopID();
@@ -75,7 +87,7 @@ public class While implements Statement
         String end = "term_while" + id;
         condition.compile(e, end);
         statement.compile(e);
-        e.emit("j " + label);
+        e.emit("j " + label + "\t# repeat the while loop");
         e.emit(end + ":");
     }
 }

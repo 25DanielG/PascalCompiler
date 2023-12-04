@@ -21,5 +21,12 @@ public interface Expression
      */
     public int eval(Environment env);
 
+    /**
+     * A method that represents the compilation of any expression AST node.
+     * @param e the emitter for which the expression will emit assembly code to
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
     public void compile(Emitter e, Object... args);
 }

@@ -59,6 +59,16 @@ public class BinOp implements Expression
         }
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the binop node of the AST.
+     *      The method compiles the left expression and pushes the result onto the stack, then
+     *      compiles the right expression and pops the left expression off the stack and performs
+     *      the final operation between the two expressions by emitting MIPS code to the emitter.
+     * @param e type Emitter the emitter to emit MIPS code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
     @Override
     public void compile(Emitter e, Object... args)
     {
@@ -69,21 +79,21 @@ public class BinOp implements Expression
         switch(this.op)
         {
             case "+":
-                e.emit("add $v0, $t0, $v0");
+                e.emit("add $v0, $t0, $v0" + "\t# add the two expressions");
                 break;
             case "-":
-                e.emit("sub $v0, $t0, $v0");
+                e.emit("sub $v0, $t0, $v0" + "\t# subtract the two expressions");
                 break;
             case "*":
-                e.emit("mult $t0, $v0");
+                e.emit("mult $t0, $v0" + "\t# add the multiply expressions");
                 e.emit("mflo $v0");
                 break;
             case "/":
-                e.emit("div $t0, $v0");
+                e.emit("div $t0, $v0" + "\t# divide the two expressions");
                 e.emit("mflo $v0");
                 break;
             case "mod":
-                e.emit("div $t0, $v0");
+                e.emit("div $t0, $v0" + "\t# add mod two expressions");
                 e.emit("mfhi $v0");
                 break;
             default:

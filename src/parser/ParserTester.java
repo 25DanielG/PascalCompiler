@@ -24,7 +24,7 @@ public class ParserTester
     {
         try
         {
-            FileInputStream inStream = new FileInputStream("test2.txt");
+            FileInputStream inStream = new FileInputStream("test3.txt");
             Scanner lex = new Scanner(inStream);
             Parser yacc = new Parser(lex);
             Environment env = new Environment();

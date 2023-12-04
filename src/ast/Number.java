@@ -37,8 +37,17 @@ public class Number implements Expression
         return value;
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the number. The method
+     *      loads the number value into the $v0 register.
+     * @param e the emitter for which the expression will emit assembly code to
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     **/
+    @Override
     public void compile(Emitter e, Object... args)
     {
-        e.emit("li $v0, " + value);
+        e.emit("li $v0, " + value + "\t# load the number $v0");
     }
 }

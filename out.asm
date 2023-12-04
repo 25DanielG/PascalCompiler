@@ -1,161 +1,158 @@
 .data
-	new_line: .asciiz "\n"
-	varsum: .word 0
-	vari: .word 0
+	new_line: .asciiz "\n"	# new line variable
 	vary: .word 0
+	varcount: .word 0
 	varx: .word 0
 .text
 .globl main
 main:
-	li $v0, 2
-	sw $v0, varx
+	li $v0, 2	# load the number $v0
+	sw $v0, varx	# assign the variable
 	la $t0, varx
-	lw $v0, ($t0)
+	lw $v0, ($t0)	# load the variable into $v0
 	subu $sp, $sp, 4
 	sw $v0, ($sp)
-	li $v0, 3
-	subu $sp, $sp, 4
-	sw $v0, ($sp)
-	la $t0, varx
-	lw $v0, ($t0)
+	li $v0, 1	# load the number $v0
 	lw $t0, ($sp)
 	addu $sp, $sp, 4
-	mult $t0, $v0
-	mflo $v0
-	lw $t0, ($sp)
-	addu $sp, $sp, 4
-	add $v0, $t0, $v0
-	sw $v0, vary
+	add $v0, $t0, $v0	# add the two expressions
+	sw $v0, vary	# assign the variable
 	la $t0, varx
-	lw $v0, ($t0)
+	lw $v0, ($t0)	# load the variable into $v0
 	subu $sp, $sp, 4
 	sw $v0, ($sp)
 	la $t0, vary
-	lw $v0, ($t0)
+	lw $v0, ($t0)	# load the variable into $v0
 	lw $t0, ($sp)
 	addu $sp, $sp, 4
-	add $v0, $t0, $v0
-	sw $v0, varx
+	add $v0, $t0, $v0	# add the two expressions
+	sw $v0, varx	# assign the variable
 	la $t0, varx
-	lw $v0, ($t0)
+	lw $v0, ($t0)	# load the variable into $v0
 	subu $sp, $sp, 4
 	sw $v0, ($sp)
 	la $t0, vary
-	lw $v0, ($t0)
+	lw $v0, ($t0)	# load the variable into $v0
 	lw $t0, ($sp)
 	addu $sp, $sp, 4
-	mult $t0, $v0
+	mult $t0, $v0	# add the multiply expressions
 	mflo $v0
 	move $a0, $v0
-	li $v0, 1
+	li $v0, 1	# print the expression
 	syscall
-	la $a0, new_line
+	la $a0, new_line	# print a new line
 	li $v0, 4
 	syscall
 	la $t0, varx
-	lw $v0, ($t0)
+	lw $v0, ($t0)	# load the variable into $v0
 	subu $sp, $sp, 4
 	sw $v0, ($sp)
 	la $t0, vary
-	lw $v0, ($t0)
+	lw $v0, ($t0)	# load the variable into $v0
 	lw $t0, ($sp)
 	addu $sp, $sp, 4
-	ble $t0, $v0, endif1
+	ble $t0, $v0, endif1	# if $t0 is less than or equal to $v0
 	la $t0, varx
-	lw $v0, ($t0)
+	lw $v0, ($t0)	# load the variable into $v0
 	move $a0, $v0
-	li $v0, 1
+	li $v0, 1	# print the expression
 	syscall
-	la $a0, new_line
+	la $a0, new_line	# print a new line
 	li $v0, 4
 	syscall
 	la $t0, vary
-	lw $v0, ($t0)
+	lw $v0, ($t0)	# load the variable into $v0
 	move $a0, $v0
-	li $v0, 1
+	li $v0, 1	# print the expression
 	syscall
-	la $a0, new_line
+	la $a0, new_line	# print a new line
 	li $v0, 4
 	syscall
 endif1:
-	li $v0, 0
-	sw $v0, varx
+	li $v0, 14	# load the number $v0
+	subu $sp, $sp, 4
+	sw $v0, ($sp)
+	li $v0, 14	# load the number $v0
+	lw $t0, ($sp)
+	addu $sp, $sp, 4
+	bne $t0, $v0, endif2	# if $t0 and $v0 are not equal
+	li $v0, 14	# load the number $v0
+	subu $sp, $sp, 4
+	sw $v0, ($sp)
+	li $v0, 14	# load the number $v0
+	lw $t0, ($sp)
+	addu $sp, $sp, 4
+	beq $t0, $v0, endif3	# if $t0 and $v0 are equal
+	li $v0, 3	# load the number $v0
+	move $a0, $v0
+	li $v0, 1	# print the expression
+	syscall
+	la $a0, new_line	# print a new line
+	li $v0, 4
+	syscall
+endif3:
+	li $v0, 14	# load the number $v0
+	subu $sp, $sp, 4
+	sw $v0, ($sp)
+	li $v0, 14	# load the number $v0
+	lw $t0, ($sp)
+	addu $sp, $sp, 4
+	bgt $t0, $v0, endif4	# if $t0 is greater than $v0
+	li $v0, 4	# load the number $v0
+	move $a0, $v0
+	li $v0, 1	# print the expression
+	syscall
+	la $a0, new_line	# print a new line
+	li $v0, 4
+	syscall
+endif4:
+endif2:
+	li $v0, 15	# load the number $v0
+	subu $sp, $sp, 4
+	sw $v0, ($sp)
+	li $v0, 14	# load the number $v0
+	lw $t0, ($sp)
+	addu $sp, $sp, 4
+	ble $t0, $v0, endif5	# if $t0 is less than or equal to $v0
+	li $v0, 5	# load the number $v0
+	move $a0, $v0
+	li $v0, 1	# print the expression
+	syscall
+	la $a0, new_line	# print a new line
+	li $v0, 4
+	syscall
+endif5:
+	li $v0, 1	# load the number $v0
+	sw $v0, varcount	# assign the variable
 while1:
-	la $t0, varx
-	lw $v0, ($t0)
+	la $t0, varcount
+	lw $v0, ($t0)	# load the variable into $v0
 	subu $sp, $sp, 4
 	sw $v0, ($sp)
-	li $v0, 8
+	li $v0, 15	# load the number $v0
 	lw $t0, ($sp)
 	addu $sp, $sp, 4
-	bge $t0, $v0, term_while1
-	la $t0, varx
-	lw $v0, ($t0)
+	bgt $t0, $v0, term_while1	# if $t0 is greater than $v0
+	la $t0, varcount
+	lw $v0, ($t0)	# load the variable into $v0
 	move $a0, $v0
-	li $v0, 1
+	li $v0, 1	# print the expression
 	syscall
-	la $a0, new_line
+	la $a0, new_line	# print a new line
 	li $v0, 4
 	syscall
-	la $t0, varx
-	lw $v0, ($t0)
+	la $t0, varcount
+	lw $v0, ($t0)	# load the variable into $v0
 	subu $sp, $sp, 4
 	sw $v0, ($sp)
-	li $v0, 2
+	li $v0, 1	# load the number $v0
 	lw $t0, ($sp)
 	addu $sp, $sp, 4
-	add $v0, $t0, $v0
-	sw $v0, varx
-	j while1
+	add $v0, $t0, $v0	# add the two expressions
+	sw $v0, varcount	# assign the variable
+	j while1	# repeat the while loop
 term_while1:
-	li $v0, 0
-	sw $v0, varsum
-	li $v0, 1
-	subu $sp, $sp, 4
-	sw $v0, ($sp)
-	li $v0, 1
-	lw $t0, ($sp)
-	addu $sp, $sp, 4
-	sub $v0, $t0, $v0
-	sw $v0, vari
-	lw $t1, vari
-	subu $sp, $sp, 4
-	sw $t1, ($sp)
-	li $t2, 5
-	subu $sp, $sp, 4
-	sw $t2, ($sp)
-for2:
-	lw $t2, ($sp)
-	addu $sp, $sp, 4
-	lw $t1, ($sp)
-	addu $sp, $sp, 4
-	addiu $t1, $t1, 1
-	sw $t1, vari
-	bgt $t1, $t2, term_for2
-	subu $sp, $sp, 4
-	sw $t1, ($sp)
-	subu $sp, $sp, 4
-	sw $t2, ($sp)
-	la $t0, varsum
-	lw $v0, ($t0)
-	subu $sp, $sp, 4
-	sw $v0, ($sp)
-	la $t0, vari
-	lw $v0, ($t0)
-	lw $t0, ($sp)
-	addu $sp, $sp, 4
-	add $v0, $t0, $v0
-	sw $v0, varsum
-	la $t0, varsum
-	lw $v0, ($t0)
-	move $a0, $v0
-	li $v0, 1
-	syscall
-	la $a0, new_line
-	li $v0, 4
-	syscall
-	j for2
-term_for2:
-	li $v0 10
+program_exit:
+	li $v0 10	# exit the program
 	syscall
 

@@ -73,6 +73,7 @@ public class ProcedureDeclaration implements Statement
         return parameters;
     }
 
+    @Override
     public void compile(Emitter e, Object... args)
     {
         throw new RuntimeException("ProcedureDeclaration not implemented");

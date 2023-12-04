@@ -63,8 +63,27 @@ public class IfElse implements Statement
         }
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the if else node. The method
+     *      compiles the if else node by first compiling the condition. If the condition is false
+     *      the program jumps to the else label. If the condition is true, the program executes
+     *      the main statement inside the if node. After the main statement is executed, the
+     *      compiled code jumps to the end if label.
+     * @param e the emitter for which the expression will emit assembly code to
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
-        throw new RuntimeException("IfElse not implemented");
+        String label = "endif" + e.nextIfID();
+        String elseLabel = "elseif" + e.nextIfID();
+        condition.compile(e, elseLabel);
+        statement.compile(e);
+        e.emit("j " + label + "\t# jump to end of if statement");
+        e.emit(elseLabel + ":");
+        elseStatement.compile(e);
+        e.emit(label + ":");
     }
 }

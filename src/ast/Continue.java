@@ -43,6 +43,16 @@ public class Continue implements Statement
         throw new ContinueException("");
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the continue node of the AST.
+     *      The method compiles the continue node by jumping to the start of the loop that the
+     *      continue node is in.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
         String loop;
@@ -54,6 +64,6 @@ public class Continue implements Statement
         {
             loop = "for";
         }
-        e.emit("j " + loop + this.id);
+        e.emit("j " + loop + this.id + "\t# continue from the loop");
     }
 }

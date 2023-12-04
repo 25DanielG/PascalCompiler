@@ -43,6 +43,17 @@ public class Break implements Statement
         throw new BreakException();
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the break node of the AST.
+     *      The method compiles the break node by jumping to the end of the loop. The method
+     *      uses the passed Emitter object to emit code jumping to the label specified by the
+     *      type of loop (for or while) and the id of the loop linked to the break statement.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
         String loop;
@@ -54,6 +65,6 @@ public class Break implements Statement
         {
             loop = "for";
         }
-        e.emit("j term_" + loop + this.id);
+        e.emit("j term_" + loop + this.id + "\t# break from the loop");
     }
 }

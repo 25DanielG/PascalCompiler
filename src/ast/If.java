@@ -49,6 +49,17 @@ public class If implements Statement
         }
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the if node of the AST.
+     *      The method starts the compilation by compiling the condition expression, and if
+     *      the condition is false, the assembly jumps to the end of the if statement. The
+     *      method also compiles the body of the if statement in case the condition is true.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition the emitter object is not null, and the args parameter is empty
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
+    @Override
     public void compile(Emitter e, Object... args)
     {
         String label = "endif" + e.nextIfID();
