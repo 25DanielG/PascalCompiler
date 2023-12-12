@@ -333,7 +333,7 @@ public class Scanner
                 eat(currentChar);
                 if (currentChar == '*')
                 {
-                    nestedCount++;
+                    ++nestedCount;
                 }
             }
         }

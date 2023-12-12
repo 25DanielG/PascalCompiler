@@ -52,7 +52,7 @@ public class ProcedureCall implements Expression, Statement
         try
         {
             Variable[] parameters = procedure.getParameters();
-            for (int i = 0; i < arguments.length; i++)
+            for (int i = 0; i < arguments.length; ++i)
             {
                 newEnv.declareVariable(parameters[i].getName(), arguments[i].eval(env));
             }
@@ -92,7 +92,7 @@ public class ProcedureCall implements Expression, Statement
         try
         {
             Variable[] parameters = procedure.getParameters();
-            for (int i = 0; i < arguments.length; i++)
+            for (int i = 0; i < arguments.length; ++i)
             {
                 newEnv.declareVariable(parameters[i].getName(), arguments[i].eval(env));
             }
@@ -126,7 +126,7 @@ public class ProcedureCall implements Expression, Statement
             e.emitPush("$v0");
         }
         e.emit("jal proc" + id + "\t# call procedure");
-        for (int i = 0; i < arguments.length; i++)
+        for (int i = 0; i < arguments.length; ++i)
         {
             e.emitPop("$t0");
         }

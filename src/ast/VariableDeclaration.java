@@ -57,7 +57,7 @@ public class VariableDeclaration implements Statement
     public VariableDeclaration[] splitNames()
     {
         VariableDeclaration[] split = new VariableDeclaration[names.length];
-        for (int i = 0; i < names.length; i++)
+        for (int i = 0; i < names.length; ++i)
         {
             String[] name = { this.names[i] };
             split[i] = new VariableDeclaration(name);
