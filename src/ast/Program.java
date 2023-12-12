@@ -63,7 +63,8 @@ public class Program implements Statement
      * A method inherited from the Statement interface to compile the Program node.
      *      The method compiles the program node by appending the start of a MIPS
      *      program to the emitter. The method adds the compiled main program statement
-     *      to the emitter. After compiling the main code, the method prepends the
+     *      to the emitter. After compiling the main code, the method compiles the
+     *      procedure decalarations. Then, the method prepends the
      *      variable section of an assembly program to the emitter. The emitter's .getVariables()
      *      method gives this method all the variables seen in the program.
      * @param e type Emitter the emitter that will emit the compiled code
@@ -84,15 +85,27 @@ public class Program implements Statement
         e.emit(".globl main");
         e.emit("main:");
         statement.compile(e);
-        e.emit("program_exit:");
+        e.emit("program_exit:"); // program exit
         e.emit("li $v0 10" + "\t# exit the program");
         e.emit("syscall");
+        e.emit("program_error:"); // program error
+        e.emit("li $v0 4" + "\t# print error message");
+        e.emit("la $a0 error_message");
+        e.emit("syscall");
+        e.emit("j program_exit");
 
-        for (String var : e.getVariables())
+        for (ProcedureDeclaration procedureDeclaration : procedureDeclarations)
         {
-            e.prepend("var" + var + ": .word 0");
+            procedureDeclaration.compile(e);
+        }
+
+        for (VariableDeclaration variableDeclaration : variableDeclarations)
+        {
+            variableDeclaration.compile(e);
         }
         e.prepend("new_line: .asciiz \"\\n\"" + "\t# new line variable");
+        e.prepend("error_message: .asciiz \"RuntimeError: null assignment, program quit unexpectedly\"" + "\t# error message");
+        e.prepend("null: .word 0" + "\t# null variable");
         e.prepend(".data");
 
         e.push();

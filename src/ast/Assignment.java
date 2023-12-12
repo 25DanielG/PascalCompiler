@@ -81,6 +81,18 @@ public class Assignment implements Statement
     public void compile(Emitter e, Object... args)
     {
         exp.compile(e);
-        e.emit("sw $v0, var" + name + "\t# assign the variable");
+        if (exp instanceof ProcedureCall) // handle errors if proc returns null
+        {
+            e.emit("la $t3, null" + "\t# load address of null variable");
+            e.emit("beq $v0, $t3, program_error" + "\t# error if assigning null");
+        }
+        if (e.isLocal(name))
+        {
+            e.emit("sw $v0, " + e.getOffset(name) + "($sp)" + "\t# assign the variable");
+        }
+        else
+        {
+            e.emit("sw $v0, var" + name + "\t# assign the variable");
+        }
     }
 }

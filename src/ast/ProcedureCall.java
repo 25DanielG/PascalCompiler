@@ -110,6 +110,15 @@ public class ProcedureCall implements Expression, Statement
     @Override
     public void compile(Emitter e, Object... args)
     {
-        throw new RuntimeException("ProcedureCall not implemented");
+        for (Expression exp : arguments)
+        {
+            exp.compile(e);
+            e.emitPush("$v0");
+        }
+        e.emit("jal proc" + id + "\t# call procedure");
+        for (int i = 0; i < arguments.length; i++)
+        {
+            e.emitPop("$t0");
+        }
     }
 }

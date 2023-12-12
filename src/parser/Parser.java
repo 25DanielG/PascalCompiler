@@ -17,7 +17,7 @@ import src.ast.Number;
  * @version 10/02/2023
  * program → VAR ids ; program | VAR ids ; PROCEDURE id (maybeparms) ; stmt program | 
  *      PROCEDURE id (maybeparms) ; stmt program | stmt .
- * stmt → WRITELN ( expr ) ; | BEGIN stmts END ; | id := expr ; | IF cond THEN stmt
+ * stmt → VAR ids ; | WRITELN ( expr ) ; | BEGIN stmts END ; | id := expr ; | IF cond THEN stmt
  *      | WHILE cond DO stmt | FOR id := expr TO expr DO stmt | CONTINUE ; | BREAK ;
  *      | IF cond THEN stmt ELSE stmt | EXIT ;
  * ids → ids , id | id
@@ -39,6 +39,8 @@ public class Parser
     private Token currentToken;
     private Map<String, Variable> symtab;
     private Object[] currentLoop;
+    private ArrayList<VariableDeclaration> variables;
+    private ArrayList<VariableDeclaration> procOverride;
 
     /**
      * Constructor for the Parser class that takes in a Scanner object and initializes the
@@ -52,7 +54,9 @@ public class Parser
         currentToken = this.scanner.nextToken();
         symtab = new HashMap<String, Variable>();
         currentLoop = new Object[]{ new Stack<Statement>(), 0 };
+        variables = new ArrayList<VariableDeclaration>();
     }
+
     /**
      * The eat method is responsible for eating the current token and checking if the current
      *      token is equal to the expected token. If the current token is equal to the expected
@@ -82,6 +86,7 @@ public class Parser
             throw new IllegalArgumentException("Expected " + expected + " but found " + currentToken);
         }
     }
+
     /**
      * The parseNumber method is responsible for parsing the next token which is required
      *      to be a number token. The method returns the parsed number and eats the token
@@ -95,29 +100,16 @@ public class Parser
         eat(new Token(Scanner.TOKEN_TYPE.NUMBER, currentToken.getValue()));
         return new Number(number);
     }
+
     /**
-     * 
-     * @return
+     * The parseProgram method is responsible for parsing a program which is the entire program.
+     * @return type Program the parsed Program AST node
      */
     public Program parseProgram()
     {
-        ArrayList<VariableDeclaration> variables = new ArrayList<VariableDeclaration>();
         while(currentToken.getValue().equals("VAR"))
         {
-            ArrayList<String> ids = new ArrayList<String>();
-            eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "VAR"));
-            String id = currentToken.getValue();
-            ids.add(id);
-            eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
-            while(!currentToken.getValue().equals(";"))
-            {
-                eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ","));
-                id = currentToken.getValue();
-                ids.add(id);
-                eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
-            }
-            eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
-            variables.add(new VariableDeclaration(ids.toArray(new String[ids.size()])));
+            variables.add(parseVariableDeclaration());
         }
         ArrayList<ProcedureDeclaration> procedures = new ArrayList<ProcedureDeclaration>();
         while(currentToken.getValue().equals("PROCEDURE"))
@@ -142,12 +134,67 @@ public class Parser
             }
             eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ")"));
             eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
+            ArrayList<src.ast.VariableDeclaration> locals = new ArrayList<src.ast.VariableDeclaration>();
+            while(currentToken.getValue().equals("VAR"))
+            {
+                locals.add(parseVariableDeclaration());
+            }
+            this.procOverride = locals;
             Statement statement = parseStatement(false);
-            procedures.add(new ProcedureDeclaration(id, parameters.toArray(new src.ast.Variable[parameters.size()]), statement));
+            this.procOverride = null;
+            // split all the variable declaration nodes
+            ArrayList<src.ast.VariableDeclaration> split = new ArrayList<src.ast.VariableDeclaration>();
+            for (src.ast.VariableDeclaration v : locals)
+            {
+                if (v.multipleNames())
+                {
+                    for (src.ast.VariableDeclaration s : v.splitNames())
+                    {
+                        split.add(s);
+                    }
+                }
+                else
+                {
+                    split.add(v);
+                }
+            }
+            procedures.add(new ProcedureDeclaration(id, parameters.toArray(new src.ast.Variable[parameters.size()]), statement, split.toArray(new VariableDeclaration[split.size()])));
         }
         Statement statement = parseStatement(false);
         return new Program(variables.toArray(new VariableDeclaration[variables.size()]), procedures.toArray(new ProcedureDeclaration[procedures.size()]), statement);
     }
+
+    /**
+     * The parseVariableDeclaration method parses a variable declaration which is defined
+     *      by VAR ids ;. The method returns the VariableDeclaration AST node corresponding
+     *      to the parsed variable declaration.
+     * @return type VariableDeclaration the parsed VariableDeclaration AST node
+     * @precondtiion the current token is not null and of type IDENTIFIER and equals "VAR"
+     * @postcondition the current token is updated to the token after the variable declaration
+     */
+    public VariableDeclaration parseVariableDeclaration()
+    {
+        ArrayList<String> ids = new ArrayList<String>();
+        eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "VAR"));
+        String id = currentToken.getValue();
+        ids.add(id);
+        eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
+        while(!currentToken.getValue().equals(";"))
+        {
+            eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ","));
+            id = currentToken.getValue();
+            ids.add(id);
+            eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, currentToken.getValue()));
+        }
+        eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, ";"));
+        VariableDeclaration node = new VariableDeclaration(ids.toArray(new String[ids.size()]));
+        if (procOverride != null)
+        {
+            procOverride.add(node);
+        }
+        return node;
+    }
+
     /**
      * The parseStatement method is responsible for parsing a statement which is defined
      *      as WRITELN(NUMBER), an assignment, a loop, or if, or a block. The method eats
@@ -162,7 +209,11 @@ public class Parser
      */
     public Statement parseStatement(boolean ignoreSemi)
     {
-        if(currentToken.getValue().equals("WRITELN"))
+        if(currentToken.getValue().equals("VAR"))
+        {
+            return parseVariableDeclaration();
+        }
+        else if(currentToken.getValue().equals("WRITELN"))
         {
             eat(new Token(Scanner.TOKEN_TYPE.IDENTIFIER, "WRITELN"));
             eat(new Token(Scanner.TOKEN_TYPE.OPERATOR, "("));
@@ -311,6 +362,7 @@ public class Parser
         }
         throw new IllegalArgumentException("Unexpected Statement, got: " + currentToken.getValue());
     }
+
     /**
      * The parseCondition method is responsible for parsing a condition which is defined as
      *      condition -> expression operator expression. The method returns the parsed condition
@@ -335,6 +387,7 @@ public class Parser
         Expression right = parseExpression();
         return new Condition(left, right, op);
     }
+
     /**
      * The parseFactor method is responsible for parsing a factor which is defined as
      *      factor -> num | ( expr ) | - factor | id | id(). The method returns the parsed factor
@@ -388,6 +441,7 @@ public class Parser
         }
         throw new IllegalArgumentException("Expected factor but found " + currentToken);
     }
+
     /**
      * The parseTerm method parses terms that contain factors and operators. The method
      *      parses a factor and stores the value and then parses either a multiplication
@@ -427,6 +481,7 @@ public class Parser
         }
         return exp == null ? left : exp;
     }
+
     /**
      * The parseExpression method parses expressions that contain terms and operators. The method
      *      first parses a term and then constantly parses operator tokens that are either a +

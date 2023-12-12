@@ -61,8 +61,14 @@ public class Variable implements Expression
     @Override
     public void compile(Emitter e, Object... args)
     {
-        e.addVariable(this.name);
-        e.emit("la $t0, var" + this.name);
-        e.emit("lw $v0, ($t0)" + "\t# load the variable into $v0");
+        if (e.isLocal(this.name))
+        {
+            e.emit("lw $v0, " + e.getOffset(this.name) + "($sp)" + "\t# load the variable into $v0");
+        }
+        else
+        {
+            e.emit("la $t0, var" + this.name);
+            e.emit("lw $v0, ($t0)" + "\t# load the variable into $v0");
+        }
     }
 }
