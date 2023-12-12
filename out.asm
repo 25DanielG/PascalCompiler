@@ -33,7 +33,12 @@ procfact:
 	la $a0, new_line	# print a new line
 	li $v0, 4
 	syscall
-	lw $v0, 8($sp)	# load the variable into $v0
+	lw $ra, ($sp)
+	addu $sp, $sp, 4
+	lw $v0, ($sp)
+	addu $sp, $sp, 4
+	jr $ra	# return
+	lw $v0, 0($sp)	# load the variable into $v0
 	move $a0, $v0
 	li $v0, 1	# print the expression
 	syscall

@@ -222,9 +222,6 @@ public class Emitter
         {
             if (locals[offset].getNames()[0].equals(name))
             {
-                System.out.println("offset: " + offset + " locals.length: " + locals.length);
-                System.out.println("Excess is " + excess);
-                System.out.println("returning: " + (excess + (4 * (locals.length - 1 - offset))));
                 return excess + (4 * (locals.length - 1 - offset));
             }
         }
@@ -241,7 +238,6 @@ public class Emitter
         {
             if (parameters[i].getName().equals(name))
             {
-                System.out.println("Detecing parameter " + name + " at offset " + (excess + (4 * (parameters.length - 1 - i))));
                 return excess + (4 * (parameters.length - 1 - i));
             }
         }
