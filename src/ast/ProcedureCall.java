@@ -107,6 +107,16 @@ public class ProcedureCall implements Expression, Statement
         }
     }
 
+    /**
+     * A method inherited from the Expression interface to compile a procedure call AST node.
+     *      The method first compiles all the arguments passed to the procedure call and then
+     *      pushes them onto the stack. Then the method emits a jump and link instruction, amnd
+     *      pops all the arguments off the stack after execution.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondtiion e is not null
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
     @Override
     public void compile(Emitter e, Object... args)
     {

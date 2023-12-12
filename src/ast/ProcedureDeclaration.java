@@ -99,6 +99,17 @@ public class ProcedureDeclaration implements Statement
         return id;
     }
 
+    /**
+     * A method inherited from the Statement interface to compile the ProcedureDeclaration node
+     *      of the AST. The method first emits the label for the procedure, then loads null
+     *      into and pushes the return variable, then pushes null for each local variable.
+     *      The method then pushes $ra, compiles the statement in the procedure, and pops
+     *      everything else.
+     * @param e type Emitter the emitter that will emit the compiled code
+     * @param args a varargs parameter type Object, the arguments passed to the compile method
+     * @precondition e is not null
+     * @postcondition the AST node is compiled into MIPS assembly
+     */
     @Override
     public void compile(Emitter e, Object... args)
     {

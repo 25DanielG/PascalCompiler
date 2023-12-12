@@ -194,8 +194,10 @@ public class Emitter
 
     /**
      * Returns the offset of the given variable name. The offset is the distance from the top of
-     *      the stack to the local variable name given as a parameter. The method assumes that the
-     *      variable name is a local variable and throws an exception if it is not.
+     *      the stack to the local variable name given as a parameter, local variable, method
+     *      name. The method assumes that the variable name is a local variable and throws an
+     *      exception if it is not. The stack is organized from top to bottom as local variables
+     *      , method name, and parameters.
      * @param name type String the name of the variable
      * @throws IllegalStateException if the method is called while not in a subroutine
      * @throws IllegalArgumentException if the variable name is not a local variable

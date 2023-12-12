@@ -1,11 +1,18 @@
-PROCEDURE countUp(count, max);
-    IF count <= max THEN
+PROCEDURE fact(num);
     BEGIN
-        WRITELN(count);
-        countUp(count + 1, max);
+        IF num < 1 THEN
+        BEGIN
+            fact := 1;
+        END;
+        ELSE
+        BEGIN
+            fact := fact(num - 1) * num;
+        END;
     END;
 
 BEGIN
-    countUp(2, 4);
+    VAR x;
+    x := fact(5);
+    WRITELN(x);
 END;
 .
