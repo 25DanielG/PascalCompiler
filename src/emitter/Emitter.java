@@ -266,4 +266,14 @@ public class Emitter
             extraStack++;
         }
     }
+
+    /**
+     * Returns the extra stack variable which keeps track of where the procedure's
+     *      local variables.
+     * @return type int the extra stack variable
+     */
+    public int getExtraStack()
+    {
+        return extraStack;
+    }
 }

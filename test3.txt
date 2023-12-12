@@ -1,18 +1,11 @@
 PROCEDURE fact(num);
     BEGIN
-        IF num < 1 THEN
-        BEGIN
-            fact := 1;
-        END;
-        ELSE
-        BEGIN
-            fact := fact(num - 1) * num;
-        END;
+        WRITELN(num);
+        EXIT;
+        WRITELN(num);
     END;
 
 BEGIN
-    VAR x;
-    x := fact(5);
-    WRITELN(x);
+    fact(5);
 END;
 .

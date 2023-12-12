@@ -37,7 +37,9 @@ public class Exit implements Statement
     /**
      * A method inherited from the Statement interface to compile the exit node of the AST.
      *      The method emits the MIPS assembly code to exit the program by jumping to the 
-     *      exit program label.
+     *      exit program label or if the program context is in a suroutine, to locate the
+     *      $ra register in the stack and jump to the address stored in $ra while cleaning
+     *      up the procedure's stack trace.
      * @param e type Emitter the emitter that will emit the compiled code
      * @param args a varargs parameter type Object, the arguments passed to the compile method
      * @precondition the emitter object is not null, and the args parameter is empty
@@ -46,6 +48,18 @@ public class Exit implements Statement
     @Override
     public void compile(Emitter e, Object... args)
     {
-        e.emit("j program_exit" + "\t# exit from the current routine");
+        if (e.context == null)
+        {
+            e.emit("j program_exit" + "\t# exit from the current routine");
+            return;
+        }
+        // find $ra in the stack
+        e.emitPop("$ra");
+        for (VariableDeclaration v : e.context.getLocals())
+        {
+            e.emitPop("$v0"); // pop local variables
+        }
+        e.emitPop("$v0"); // pop method return value
+        e.emit("jr $ra\t# return");
     }
 }
